@@ -8,14 +8,15 @@
 
 char *dev;
 
-void callback(u_char *param, const  struct pcap_pkthdr *pkth, const  u_char *packet){
+void callback(u_char *param, const  struct pcap_pkthdr *pkth, const unsigned char *packet){
 
     struct ethhdr *ethh;
     struct iphdr *iph;
     struct tcphdr *tcph;
 
     struct ip *ip;
-    const char *data;
+    const unsigned char *data;
+    int length;
 
     ethh = (struct ethhdr *)packet;
 
@@ -38,10 +39,15 @@ void callback(u_char *param, const  struct pcap_pkthdr *pkth, const  u_char *pac
             printf("\nSource Port: %u\n", ntohs(tcph->dest));
 
             data = (char*)(packet + sizeof(struct ethhdr) + sizeof(struct tcphdr) + sizeof(struct iphdr));
+            
             if(data == NULL){
                 printf("No Data\n");
             }else{
-                printf("Data:\n%s\n", data);
+                for(int i = 0 ; i < 16 ; i++){
+                    printf("%02x ", *data);
+                    data += 1;
+                }
+                printf("\n\n");
             }
 
         }else{ 
@@ -66,7 +72,6 @@ void callback(u_char *param, const  struct pcap_pkthdr *pkth, const  u_char *pac
         printf("\nDest MAC Address: ");
         for(int i = 0; i < 6; i++) printf("%02x", ethh->h_dest[i]);
     }
-
 }
 
         
